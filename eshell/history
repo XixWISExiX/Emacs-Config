@@ -1,0 +1,7 @@
+cd eshell/
+cd ..
+ls
+ls 
+cd images/
+ls 
+pwd 

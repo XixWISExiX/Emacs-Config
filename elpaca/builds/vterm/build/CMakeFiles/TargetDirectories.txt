@@ -1,0 +1,4 @@
+/home/joshua/.config/emacs/elpaca/builds/vterm/build/CMakeFiles/vterm-module.dir
+/home/joshua/.config/emacs/elpaca/builds/vterm/build/CMakeFiles/run.dir
+/home/joshua/.config/emacs/elpaca/builds/vterm/build/CMakeFiles/edit_cache.dir
+/home/joshua/.config/emacs/elpaca/builds/vterm/build/CMakeFiles/rebuild_cache.dir
