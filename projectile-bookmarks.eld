@@ -1,1 +1,1 @@
-("~/")
+("~/Desktop/MainFolder/Work/Research/POLARIS-AI/" "~/.config/emacs/" "~/" "~/Desktop/MainFolder/Work/Stockmarket/Mafic/")

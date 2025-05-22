@@ -31,6 +31,7 @@
 - [[#theme-using-doom-one][THEME (Using Doom-One)]]
 - [[#ivy-counsel][IVY (COUNSEL)]]
 - [[#language-support][LANGUAGE SUPPORT]]
+  - [[#markdown][Markdown]]
 - [[#modeline][MODELINE]]
 - [[#neotree][NEOTREE]]
 - [[#org-mode][ORG MODE]]
@@ -158,12 +159,16 @@
    (t
     (browse-url-at-point))))
 
-(with-eval-after-load 'evil
-  (define-key evil-normal-state-map "gx" #'my/gx-smart-open))
+;; Package to allow undo and redo with VIM keybinds
+(use-package undo-fu
+  :ensure t)
 
-
-;; Set up VIM half-page up keybind in normal mode
 (with-eval-after-load 'evil
+  (define-key evil-normal-state-map "gx" #'my/gx-smart-open) ;; link opener
+  (setq evil-undo-system 'undo-fu)
+  (define-key evil-normal-state-map (kbd "u") #'undo-fu-only-undo)
+  (define-key evil-normal-state-map (kbd "C-r") #'undo-fu-only-redo)
+  ;; Set up VIM half-page up keybind in normal mode
   (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
   (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up))
 
@@ -715,6 +720,36 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 ;;(use-package lua-mode)
 #+end_src
 
+** Markdown
+Enable markdown (.md file) highlighting.
+#+begin_src emacs-lisp
+;;(use-package markdown-mode
+;;  :ensure t
+;;  :mode ("\\.md\\'" . markdown-mode)
+;;  :config
+;;  (setq markdown-command "pandoc"))
+  
+(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+
+#+end_src
+
+Auto format in markdown files.
+#+begin_src emacs-lisp
+;;(use-package prettier
+;;  :ensure t
+;;  :hook (markdown-mode . prettier-mode))
+
+;;  :hook (markdown-mode . format-all-mode))
+
+;;(use-package grip-mode
+;;  :ensure t
+;;  :hook (markdown-mode . grip-mode)
+;;  :custom
+;;  (grip-update-after-change nil)
+;;  (grip-preview-use-webkit nil)) ;; use browser instead of Emacs GUI
+
+#+end_src
+
 * MODELINE
 The modeline is the bottom status bar that appears in Emacs windows.  While you can create your own custom modeline, why go to the trouble when Doom Emacs already has a nice modeline package available.  For more information on what is available to configure in the Doom modeline.
 
@@ -900,10 +935,10 @@ Vterm is a terminal emulator within Emacs.  The ‘shell-file-name’ setting se
 #+begin_src emacs-lisp
 (use-package vterm
 :ensure t
-:diminish
 :config
 (setq shell-file-name "/bin/bash"
-     vterm-max-scrollback 5000))
+     vterm-max-scrollback 5000)
+(define-key vterm-mode-map (kbd "C-S-v") #'vterm-yank))
 #+end_src
 
 ** Vterm-Toggle (not active)

@@ -88,12 +88,16 @@
    (t
     (browse-url-at-point))))
 
-(with-eval-after-load 'evil
-  (define-key evil-normal-state-map "gx" #'my/gx-smart-open))
+;; Package to allow undo and redo with VIM keybinds
+(use-package undo-fu
+  :ensure t)
 
-
-;; Set up VIM half-page up keybind in normal mode
 (with-eval-after-load 'evil
+  (define-key evil-normal-state-map "gx" #'my/gx-smart-open) ;; link opener
+  (setq evil-undo-system 'undo-fu)
+  (define-key evil-normal-state-map (kbd "u") #'undo-fu-only-undo)
+  (define-key evil-normal-state-map (kbd "C-r") #'undo-fu-only-redo)
+  ;; Set up VIM half-page up keybind in normal mode
   (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
   (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up))
 
@@ -532,6 +536,27 @@ one, an error is signaled."
 ;;(use-package haskell-mode)
 ;;(use-package lua-mode)
 
+;;(use-package markdown-mode
+;;  :ensure t
+;;  :mode ("\\.md\\'" . markdown-mode)
+;;  :config
+;;  (setq markdown-command "pandoc"))
+  
+(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+
+;;(use-package prettier
+;;  :ensure t
+;;  :hook (markdown-mode . prettier-mode))
+
+;;  :hook (markdown-mode . format-all-mode))
+
+;;(use-package grip-mode
+;;  :ensure t
+;;  :hook (markdown-mode . grip-mode)
+;;  :custom
+;;  (grip-update-after-change nil)
+;;  (grip-preview-use-webkit nil)) ;; use browser instead of Emacs GUI
+
 ;;(use-package doom-modeline
 ;;  :ensure t
 ;;  :after all-the-icons
@@ -639,10 +664,10 @@ one, an error is signaled."
 
 (use-package vterm
 :ensure t
-:diminish
 :config
 (setq shell-file-name "/bin/bash"
-     vterm-max-scrollback 5000))
+     vterm-max-scrollback 5000)
+(define-key vterm-mode-map (kbd "C-S-v") #'vterm-yank))
 
 ;; TODO GET VTERM-TOGGLE WORKING!!!!
 ;; TODO SEARCH FOR ESHELL VS VTERM
