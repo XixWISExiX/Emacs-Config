@@ -140,7 +140,7 @@
       "d p" '(peep-dired :wk "Peep-dired")) ;; May need to spam esc key too to see images
       
     (dt/leader-keys
-      "e" '(:ignore t :wk "Eshell/Evaluate")
+      "e" '(:ignore t :wk "Eshell/Evaluate/EWW")
       "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
       "e d" '(eval-defun :wk "Evaluate defun containing or after point")
       "e e" '(eval-expression :wk "Evaluate an elisp expression")
@@ -148,7 +148,8 @@
       ;;"e h" '(counsel-esh-expression :wk "Eshell history")
       "e l" '(eval-last-sexp :wk "Evaluate elisp expression before point")
       "e r" '(eval-region :wk "Evaluate elisp in region")
-      "e s" '(eshell :wk "Eshell"))
+      "e s" '(eshell :wk "Eshell")
+      "e w" '(eww :wk "Open EWW")) ;; INTERNET SEARCH ENGINE
       
     (dt/leader-keys
       "h" '(:ignore t :wk "Help")
@@ -159,6 +160,10 @@
                   (ignore (elpaca-process-queues)))
                 :wk "Reload emacs config"))
       ;;"h r r" '(reload-init-file :wk "Reload emacs config"))
+
+;;    (dt/leader-keys
+;;      "m d" '(:ignore t :wk "Markdown")
+;;      "m d r" '(my/toggle-markdown-preview-eww :wk "Markdown Render"))
       
     (dt/leader-keys
       "m" '(:ignore t :wk "Org")
@@ -168,23 +173,27 @@
       "m t" '(org-todo :wk "Org todo")
       "m B" '(org-babel-tangle :wk "Org babel tangle")
       "m T" '(org-todo-list :wk "Org todo list"))
-      
+     
     (dt/leader-keys
       "m b" '(:ignore t :wk "Tables")
       "m b -" '(org-table-insert-hline :wk "Insert hline in table"))
 
     (dt/leader-keys
-      "m d" '(:ignore t :wk "Date/deadline")
+      "m d" '(:ignore t :wk "Date/deadline/Markdown")
+;;      "m d r" '(my/toggle-markdown-preview-eww :wk "Markdown Render")
       "m d t" '(org-time-stamp :wk "Org time stamp"))
       
     (dt/leader-keys
       "t" '(:ignore t :wk "Toggle")
-      "t f" '(my/toggle-buffer-fullscreen :wk "Toggle Full Buffer")
+      "t f" '(my/toggle-buffer-fullscreen :wk "Toggle Full Buffer") ;; Make buffer go full screen and not full screen
       "t h" '(my/toggle-org-eager-fontification :wk "Toggle Org Fontification") ;; Useful for code highlight rendering
-      "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-      "t t" '(visual-line-mode :wk "Toggle truncated lines")
-      ;;"t v" '(my/vterm-toggle :wk "Toggle vterm"))
-      "t v" '(vterm :wk "Open vterm"))
+      "t n" '(display-line-numbers-mode :wk "Toggle line numbers")
+      "t c" '(my/toggle-line-numbers :wk "Toggle relative line numbers")
+
+      "t l" '(visual-line-mode :wk "Toggle truncated lines")
+      "t t" '(my/toggle-theme :wk "Toggle Theme")
+      "t v" '(vterm-toggle :wk "Toggle vterm"))
+      ;;"t v" '(vterm :wk "Open vterm"))
       
     (dt/leader-keys
       "w" '(:ignore t :wk "Windows")
@@ -216,8 +225,9 @@
   :ensure t
   :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 
-;; Set firefox as default browser
+;; Set default browser
 (setq browse-url-browser-function 'browse-url-firefox)
+;;(setq browse-url-browser-function 'eww-browse-url)
 
 ;;(use-package app-launcher
 ;;  :ensure t
@@ -382,6 +392,12 @@ one, an error is signaled."
 
 ;;(add-hook 'peep-dired-hook 'evil-normalize-keymaps)
 
+(require 'eww) ;; Force load now to make sure eww-mode-map exists
+
+(with-eval-after-load 'eww
+  (define-key eww-mode-map (kbd "M-h") #'eww-back-url)
+  (define-key eww-mode-map (kbd "M-l") #'eww-forward-url))
+
 (use-package flycheck
   :ensure t
   :defer t
@@ -493,6 +509,20 @@ one, an error is signaled."
   :config
   (load-theme 'doom-one t))
 
+(setq my/dark-theme 'doom-one)
+(setq my/light-theme 'doom-opera-light)
+(setq my/current-theme my/dark-theme)
+
+(defun my/toggle-theme ()
+  "Toggle between dark and light Doom themes."
+  (interactive)
+  (disable-theme my/current-theme)
+  (setq my/current-theme
+        (if (eq my/current-theme my/dark-theme)
+            my/light-theme
+          my/dark-theme))
+  (load-theme my/current-theme t))
+
   ;; Link to make custom themes (https://mswift42.github.io/themecreator/)
   ;; Make !/.config/emacs/themes/dtmacs-theme.el
   ;;(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
@@ -536,40 +566,22 @@ one, an error is signaled."
 ;;(use-package haskell-mode)
 ;;(use-package lua-mode)
 
-;;(use-package markdown-mode
-;;  :ensure t
-;;  :mode ("\\.md\\'" . markdown-mode)
-;;  :config
-;;  (setq markdown-command "pandoc"))
-  
-(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+;; Highlighting
+(use-package markdown-mode
+  :ensure t
+  :mode ("\\.md\\'" . markdown-mode)
+  :config
+  (setq markdown-command "pandoc"))
 
-;;(use-package prettier
-;;  :ensure t
-;;  :hook (markdown-mode . prettier-mode))
-
-;;  :hook (markdown-mode . format-all-mode))
-
-;;(use-package grip-mode
-;;  :ensure t
-;;  :hook (markdown-mode . grip-mode)
-;;  :custom
-;;  (grip-update-after-change nil)
-;;  (grip-preview-use-webkit nil)) ;; use browser instead of Emacs GUI
-
-;;(use-package doom-modeline
-;;  :ensure t
-;;  :after all-the-icons
-;;  :init (doom-modeline-mode 1)
-;;  :config
-;;  (setq doom-modeline-height 35      ;; sets modeline height
-;;        doom-modeline-bar-width 5    ;; sets right bar width
-;;        doom-modeline-persp-name t   ;; adds perspective name to modeline
-;;        doom-modeline-persp-icon t)) ;; adds folder icon next to persp name
-        
-;;(use-package doom-modeline :ensure t)
-;;(require 'doom-modeline)
-;;(doom-modeline-mode 1)
+(use-package doom-modeline
+  :ensure t
+  :after all-the-icons
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-height 35      ;; sets modeline height
+        doom-modeline-bar-width 5    ;; sets right bar width
+        doom-modeline-persp-name t   ;; adds perspective name to modeline
+        doom-modeline-persp-icon t)) ;; adds folder icon next to persp name
 
 (use-package neotree
   :ensure t
@@ -600,7 +612,7 @@ one, an error is signaled."
 (use-package org-bullets :ensure t)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
-(electric-indent-mode -1)
+;;(electric-indent-mode -1)
 (setq org-edit-src-content-indentation 0)
 
 (require 'org-tempo)
@@ -669,17 +681,6 @@ one, an error is signaled."
      vterm-max-scrollback 5000)
 (define-key vterm-mode-map (kbd "C-S-v") #'vterm-yank))
 
-;; TODO GET VTERM-TOGGLE WORKING!!!!
-;; TODO SEARCH FOR ESHELL VS VTERM
-(defun my/vterm-toggle ()
-  "Toggle a vterm buffer named *vterm*."
-  (interactive)
-  (if (get-buffer "*vterm*")
-      (if (eq (current-buffer) (get-buffer "*vterm*"))
-          (previous-buffer)
-        (switch-to-buffer "*vterm*"))
-    (vterm)))
-
 (use-package vterm-toggle
   :ensure t
   :after vterm
@@ -728,3 +729,22 @@ one, an error is signaled."
 	which-key-max-description-length 25
 	which-key-allow-imprecise-window-fit nil
 	which-key-separator " → " ))
+
+;; Vim-like settings in Emacs
+(setq display-line-numbers-type 'relative)
+
+(defun my/toggle-line-numbers ()
+  "Toggle between relative and absolute line numbers."
+  (interactive)
+  (setq display-line-numbers-type
+        (if (eq display-line-numbers-type 'relative)
+            'absolute
+          'relative))
+  (global-display-line-numbers-mode 1)) ;; Ensure it's on
+
+(global-font-lock-mode 1)              ;; syntax on
+(setq-default tab-width 4)             ;; tabstop
+(setq-default standard-indent 4)       ;; shiftwidth
+(setq-default c-basic-offset 4)        ;; for C/C++/Java
+(setq-default indent-tabs-mode nil)    ;; expandtab
+(electric-indent-mode 1)               ;; autoindent

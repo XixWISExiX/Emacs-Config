@@ -5,19 +5,20 @@
 #+OPTIONS: toc:3
 
 * TABLE OF CONTENTS :toc:
-- [[#emacs-config][EMACS CONFIG]]
+- [[#emacs-config-notes][EMACS CONFIG NOTES]]
 - [[#important-programs-to-load-first][IMPORTANT PROGRAMS TO LOAD FIRST]]
   - [[#package-manager-elpaca][Package Manager (Elpaca)]]
   - [[#load-evil-mode-vim-keybinds][Load Evil Mode (vim keybinds)]]
   - [[#general-keybindings-allows-you-to-set-keybinds][General Keybindings (allows you to set keybinds)]]
 - [[#all-the-icons][ALL THE ICONS]]
-- [[#app-launcher][APP LAUNCHER]]
+- [[#app-launcher-using-firefox][APP LAUNCHER (using firefox)]]
 - [[#backups-set-to-false][BACKUPS (set to false)]]
 - [[#buffer-move][BUFFER MOVE]]
 - [[#company][COMPANY]]
 - [[#dashboard][DASHBOARD]]
 - [[#diminish][DIMINISH]]
 - [[#dired][DIRED]]
+- [[#eww-internet-search-engine][EWW (Internet Search Engine)]]
 - [[#flycheck][FLYCHECK]]
 - [[#fonts][FONTS]]
   - [[#setting-the-font-face][Setting The Font Face]]
@@ -37,7 +38,7 @@
 - [[#org-mode][ORG MODE]]
   - [[#enable-table-of-contents][Enable Table of Contents]]
   - [[#enabline-org-bullets][Enabline Org Bullets]]
-  - [[#disable-electric-indent][Disable Electric Indent]]
+  - [[#disable-electric-indent-not-currently-disabled][Disable Electric Indent (not currently disabled)]]
   - [[#source-code-block-tag-expansion][Source Code Block Tag Expansion]]
 - [[#pdfs][PDFs]]
 - [[#projectile][PROJECTILE]]
@@ -45,12 +46,14 @@
 - [[#shells-and-terminals][SHELLS AND TERMINALS]]
   - [[#eshell][Eshell]]
   - [[#vterm][Vterm]]
-  - [[#vterm-toggle-not-active][Vterm-Toggle (not active)]]
+  - [[#vterm-toggle][Vterm-Toggle]]
 - [[#sudo-edit][SUDO EDIT]]
 - [[#which-key][WHICH-KEY]]
+- [[#vimrc-settings][VIMRC SETTINGS]]
 
-* TODO EMACS CONFIG
-- [] Fix the ubuntu issues with vterm & modeline (emacs version probably).
+* EMACS CONFIG NOTES
+Note that this config is fully working with emacs28 on ubuntu. Without this, some commands wont work so please keep that in mind.
+
 
 
 * IMPORTANT PROGRAMS TO LOAD FIRST
@@ -211,7 +214,7 @@
       "d p" '(peep-dired :wk "Peep-dired")) ;; May need to spam esc key too to see images
       
     (dt/leader-keys
-      "e" '(:ignore t :wk "Eshell/Evaluate")
+      "e" '(:ignore t :wk "Eshell/Evaluate/EWW")
       "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
       "e d" '(eval-defun :wk "Evaluate defun containing or after point")
       "e e" '(eval-expression :wk "Evaluate an elisp expression")
@@ -219,7 +222,8 @@
       ;;"e h" '(counsel-esh-expression :wk "Eshell history")
       "e l" '(eval-last-sexp :wk "Evaluate elisp expression before point")
       "e r" '(eval-region :wk "Evaluate elisp in region")
-      "e s" '(eshell :wk "Eshell"))
+      "e s" '(eshell :wk "Eshell")
+      "e w" '(eww :wk "Open EWW")) ;; INTERNET SEARCH ENGINE
       
     (dt/leader-keys
       "h" '(:ignore t :wk "Help")
@@ -230,6 +234,10 @@
                   (ignore (elpaca-process-queues)))
                 :wk "Reload emacs config"))
       ;;"h r r" '(reload-init-file :wk "Reload emacs config"))
+
+;;    (dt/leader-keys
+;;      "m d" '(:ignore t :wk "Markdown")
+;;      "m d r" '(my/toggle-markdown-preview-eww :wk "Markdown Render"))
       
     (dt/leader-keys
       "m" '(:ignore t :wk "Org")
@@ -239,23 +247,27 @@
       "m t" '(org-todo :wk "Org todo")
       "m B" '(org-babel-tangle :wk "Org babel tangle")
       "m T" '(org-todo-list :wk "Org todo list"))
-      
+     
     (dt/leader-keys
       "m b" '(:ignore t :wk "Tables")
       "m b -" '(org-table-insert-hline :wk "Insert hline in table"))
 
     (dt/leader-keys
-      "m d" '(:ignore t :wk "Date/deadline")
+      "m d" '(:ignore t :wk "Date/deadline/Markdown")
+;;      "m d r" '(my/toggle-markdown-preview-eww :wk "Markdown Render")
       "m d t" '(org-time-stamp :wk "Org time stamp"))
       
     (dt/leader-keys
       "t" '(:ignore t :wk "Toggle")
-      "t f" '(my/toggle-buffer-fullscreen :wk "Toggle Full Buffer")
+      "t f" '(my/toggle-buffer-fullscreen :wk "Toggle Full Buffer") ;; Make buffer go full screen and not full screen
       "t h" '(my/toggle-org-eager-fontification :wk "Toggle Org Fontification") ;; Useful for code highlight rendering
-      "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-      "t t" '(visual-line-mode :wk "Toggle truncated lines")
-      ;;"t v" '(my/vterm-toggle :wk "Toggle vterm"))
-      "t v" '(vterm :wk "Open vterm"))
+      "t n" '(display-line-numbers-mode :wk "Toggle line numbers")
+      "t c" '(my/toggle-line-numbers :wk "Toggle relative line numbers")
+
+      "t l" '(visual-line-mode :wk "Toggle truncated lines")
+      "t t" '(my/toggle-theme :wk "Toggle Theme")
+      "t v" '(vterm-toggle :wk "Toggle vterm"))
+      ;;"t v" '(vterm :wk "Open vterm"))
       
     (dt/leader-keys
       "w" '(:ignore t :wk "Windows")
@@ -294,13 +306,14 @@
   :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 #+end_src
 
-* APP LAUNCHER
+* APP LAUNCHER (using firefox)
 The app-launcher is a better run launcher since it reads the desktop applications on your system and you can search them by their names as defined in their desktop file.  This means that sometimes you have to search for a generic term rather than the actual binary command of the program.
 
 #+begin_src emacs-lisp
 
-;; Set firefox as default browser
+;; Set default browser
 (setq browse-url-browser-function 'browse-url-firefox)
+;;(setq browse-url-browser-function 'eww-browse-url)
 
 ;;(use-package app-launcher
 ;;  :ensure t
@@ -498,6 +511,16 @@ Makes it so you are able to see videos and certain image types.
 ;;(add-hook 'peep-dired-hook 'evil-normalize-keymaps)
 #+end_src
 
+* EWW (Internet Search Engine)
+"SPC e w" opens up EWW.
+#+begin_src emacs-lisp
+(require 'eww) ;; Force load now to make sure eww-mode-map exists
+
+(with-eval-after-load 'eww
+  (define-key eww-mode-map (kbd "M-h") #'eww-back-url)
+  (define-key eww-mode-map (kbd "M-l") #'eww-forward-url))
+#+end_src
+
 * FLYCHECK
 Install luacheck from your Linux distro’s repositories for flycheck to work correctly with lua files.  Install python-pylint for flycheck to work with python files.  Haskell works with flycheck as long as haskell-ghc or haskell-stack-ghc is installed.  For more information on language support for flycheck.
 
@@ -664,6 +687,20 @@ The theme is currently using doom-one, not the custom theme if you want to look 
   :config
   (load-theme 'doom-one t))
 
+(setq my/dark-theme 'doom-one)
+(setq my/light-theme 'doom-opera-light)
+(setq my/current-theme my/dark-theme)
+
+(defun my/toggle-theme ()
+  "Toggle between dark and light Doom themes."
+  (interactive)
+  (disable-theme my/current-theme)
+  (setq my/current-theme
+        (if (eq my/current-theme my/dark-theme)
+            my/light-theme
+          my/dark-theme))
+  (load-theme my/current-theme t))
+
   ;; Link to make custom themes (https://mswift42.github.io/themecreator/)
   ;; Make !/.config/emacs/themes/dtmacs-theme.el
   ;;(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
@@ -721,52 +758,28 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 #+end_src
 
 ** Markdown
-Enable markdown (.md file) highlighting.
 #+begin_src emacs-lisp
-;;(use-package markdown-mode
-;;  :ensure t
-;;  :mode ("\\.md\\'" . markdown-mode)
-;;  :config
-;;  (setq markdown-command "pandoc"))
-  
-(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
-
-#+end_src
-
-Auto format in markdown files.
-#+begin_src emacs-lisp
-;;(use-package prettier
-;;  :ensure t
-;;  :hook (markdown-mode . prettier-mode))
-
-;;  :hook (markdown-mode . format-all-mode))
-
-;;(use-package grip-mode
-;;  :ensure t
-;;  :hook (markdown-mode . grip-mode)
-;;  :custom
-;;  (grip-update-after-change nil)
-;;  (grip-preview-use-webkit nil)) ;; use browser instead of Emacs GUI
-
+;; Highlighting
+(use-package markdown-mode
+  :ensure t
+  :mode ("\\.md\\'" . markdown-mode)
+  :config
+  (setq markdown-command "pandoc"))
 #+end_src
 
 * MODELINE
 The modeline is the bottom status bar that appears in Emacs windows.  While you can create your own custom modeline, why go to the trouble when Doom Emacs already has a nice modeline package available.  For more information on what is available to configure in the Doom modeline.
 
 #+begin_src emacs-lisp
-;;(use-package doom-modeline
-;;  :ensure t
-;;  :after all-the-icons
-;;  :init (doom-modeline-mode 1)
-;;  :config
-;;  (setq doom-modeline-height 35      ;; sets modeline height
-;;        doom-modeline-bar-width 5    ;; sets right bar width
-;;        doom-modeline-persp-name t   ;; adds perspective name to modeline
-;;        doom-modeline-persp-icon t)) ;; adds folder icon next to persp name
-        
-;;(use-package doom-modeline :ensure t)
-;;(require 'doom-modeline)
-;;(doom-modeline-mode 1)
+(use-package doom-modeline
+  :ensure t
+  :after all-the-icons
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-height 35      ;; sets modeline height
+        doom-modeline-bar-width 5    ;; sets right bar width
+        doom-modeline-persp-name t   ;; adds perspective name to modeline
+        doom-modeline-persp-icon t)) ;; adds folder icon next to persp name
 
 #+end_src
 
@@ -818,11 +831,11 @@ Org-bullets gives us attractive bullets rather than asterisks.
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+end_src
 
-** Disable Electric Indent
+** Disable Electric Indent (not currently disabled)
 Org mode source blocks have some really weird and annoying default indentation behavior.  I think this has to do with electric-indent-mode, which is turned on by default in Emacs.  So let’s turn it OFF!
 
 #+begin_src emacs-lisp
-(electric-indent-mode -1)
+;;(electric-indent-mode -1)
 (setq org-edit-src-content-indentation 0)
 #+end_src
 
@@ -941,22 +954,11 @@ Vterm is a terminal emulator within Emacs.  The ‘shell-file-name’ setting se
 (define-key vterm-mode-map (kbd "C-S-v") #'vterm-yank))
 #+end_src
 
-** Vterm-Toggle (not active)
+** Vterm-Toggle
 vterm-toggle toggles between the vterm buffer and whatever buffer you are editing.
 (there is a PPA issue, need a higher version of emacs for this to work)
  
 #+begin_src emacs-lisp
-
-;; TODO GET VTERM-TOGGLE WORKING!!!!
-;; TODO SEARCH FOR ESHELL VS VTERM
-(defun my/vterm-toggle ()
-  "Toggle a vterm buffer named *vterm*."
-  (interactive)
-  (if (get-buffer "*vterm*")
-      (if (eq (current-buffer) (get-buffer "*vterm*"))
-          (previous-buffer)
-        (switch-to-buffer "*vterm*"))
-    (vterm)))
 
 (use-package vterm-toggle
   :ensure t
@@ -1016,3 +1018,26 @@ sudo-edit gives us the ability to open files with sudo privileges or switch over
 	  which-key-separator " → " ))
 #+END_SRC
 
+
+* VIMRC SETTINGS
+#+begin_src emacs-lisp
+
+;; Vim-like settings in Emacs
+(setq display-line-numbers-type 'relative)
+
+(defun my/toggle-line-numbers ()
+  "Toggle between relative and absolute line numbers."
+  (interactive)
+  (setq display-line-numbers-type
+        (if (eq display-line-numbers-type 'relative)
+            'absolute
+          'relative))
+  (global-display-line-numbers-mode 1)) ;; Ensure it's on
+
+(global-font-lock-mode 1)              ;; syntax on
+(setq-default tab-width 4)             ;; tabstop
+(setq-default standard-indent 4)       ;; shiftwidth
+(setq-default c-basic-offset 4)        ;; for C/C++/Java
+(setq-default indent-tabs-mode nil)    ;; expandtab
+(electric-indent-mode 1)               ;; autoindent
+#+end_src

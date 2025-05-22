@@ -1,0 +1,1 @@
+/home/joshua/.config/emacs/elpaca/repos/prettier/bootstrap-min.js

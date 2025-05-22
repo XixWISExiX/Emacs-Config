@@ -1,0 +1,1 @@
+/home/joshua/.config/emacs/elpaca/repos/editorconfig-emacs/editorconfig-conf-mode.el
