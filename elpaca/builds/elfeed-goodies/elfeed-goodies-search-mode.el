@@ -1,0 +1,1 @@
+/home/joshua/.config/emacs/elpaca/repos/elfeed-goodies/elfeed-goodies-search-mode.el

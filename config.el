@@ -116,9 +116,11 @@
     :global-prefix "M-SPC") ;; access leader in insert mode
     
     (dt/leader-keys
-      "SPC" '(counsel-M-x :wk "Counsel M-x")
+      "SPC" '(perspective-map :wk "Perspective") ;; Lists all the perspective keybindings
       "." '(find-file :wk "Find file")
+      "=" '(counsel-M-x :wk "Counsel M-x")
       "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+      "f m" '((lambda () (interactive) (find-file "~/Desktop/MainFolder/Work/Research/notes/research.org")) :wk "Main Reseach Page")
       "f r" '(counsel-recentf :wk "Find recent files")
       "TAB TAB" '(comment-line :wk "Comment lines"))
 
@@ -150,6 +152,11 @@
       "e r" '(eval-region :wk "Evaluate elisp in region")
       "e s" '(eshell :wk "Eshell")
       "e w" '(eww :wk "Open EWW")) ;; INTERNET SEARCH ENGINE
+
+    ;; More commands on repo inspired repo
+    (dt/leader-keys
+      "g" '(:ignore t :wk "Git")
+      "g t" '(git-timemachine :wk "Git time machine"))
       
     (dt/leader-keys
       "h" '(:ignore t :wk "Help")
@@ -184,6 +191,10 @@
       "m d t" '(org-time-stamp :wk "Org time stamp"))
       
     (dt/leader-keys
+      "s" '(:ignore t :wk "Search")
+      "s t" '(tldr :wk "TLDR"))
+
+    (dt/leader-keys
       "t" '(:ignore t :wk "Toggle")
       "t f" '(my/toggle-buffer-fullscreen :wk "Toggle Full Buffer") ;; Make buffer go full screen and not full screen
       "t h" '(my/toggle-org-eager-fontification :wk "Toggle Org Fontification") ;; Useful for code highlight rendering
@@ -194,7 +205,7 @@
       "t t" '(my/toggle-theme :wk "Toggle Theme")
       "t v" '(vterm-toggle :wk "Toggle vterm"))
       ;;"t v" '(vterm :wk "Open vterm"))
-      
+
     (dt/leader-keys
       "w" '(:ignore t :wk "Windows")
       ;; Window splits
@@ -258,7 +269,7 @@
                     (delete-frame))))
 
 (setq make-backup-files nil) ; Don't create `~` backup files
-;;(setq backup-directory-alist '((".*" . "~/.Trash"))) ; Store backup files in trash directory
+;;(setq backup-directory-alist '((".*" . "~/.local/share/Trash/files"))) ; Store backup files in trash directory
 
 (require 'windmove)
 
@@ -392,6 +403,38 @@ one, an error is signaled."
 
 ;;(add-hook 'peep-dired-hook 'evil-normalize-keymaps)
 
+;;(use-package elfeed
+;;  :ensure t
+;;  :config
+;;  (setq elfeed-search-feed-face ":foreground #ffffff :weight bold"
+;;        elfeed-feeds (quote
+;;                       (("https://www.reddit.com/r/linux.rss" reddit linux)
+;;                        ;;("https://www.reddit.com/r/commandline.rss" reddit commandline)
+;;                        ;;("https://www.reddit.com/r/distrotube.rss" reddit distrotube)
+;;                        ;;("https://www.reddit.com/r/emacs.rss" reddit emacs)
+;;                        ;;("https://www.gamingonlinux.com/article_rss.php" gaming linux)
+;;                        ;;("https://hackaday.com/blog/feed/" hackaday linux)
+;;                        ;;("https://opensource.com/feed" opensource linux)
+;;                        ;;("https://linux.softpedia.com/backend.xml" softpedia linux)
+;;                        ;;("https://itsfoss.com/feed/" itsfoss linux)
+;;                        ;;("https://www.zdnet.com/topic/linux/rss.xml" zdnet linux)
+;;                        ;;("https://www.phoronix.com/rss.php" phoronix linux)
+;;                        ;;("http://feeds.feedburner.com/d0od" omgubuntu linux)
+;;                        ;;("https://www.computerworld.com/index.rss" computerworld linux)
+;;                        ;;("https://www.networkworld.com/category/linux/index.rss" networkworld linux)
+;;                        ;;("https://www.techrepublic.com/rssfeeds/topic/open-source/" techrepublic linux)
+;;                        ;;("https://betanews.com/feed" betanews linux)
+;;                        ;;("http://lxer.com/module/newswire/headlines.rss" lxer linux)
+;;                        ("https://distrowatch.com/news/dwd.xml" distrowatch linux)))))
+;; 
+;;
+;;(use-package elfeed-goodies
+;;  :ensure t
+;;  :init
+;;  (elfeed-goodies/setup)
+;;  :config
+;;  (setq elfeed-goodies/entry-pane-size 0.5))
+
 (require 'eww) ;; Force load now to make sure eww-mode-map exists
 
 (with-eval-after-load 'eww
@@ -461,6 +504,22 @@ one, an error is signaled."
       (setq my/fullscreen-window-layout t)
       (delete-other-windows))))
 
+(use-package git-timemachine
+  :ensure t
+  :after git-timemachine
+  :hook (evil-normalize-keymaps . git-timemachine-hook)
+  :config
+    (evil-define-key 'normal git-timemachine-mode-map (kbd "C-j") 'git-timemachine-show-previous-revision)
+    (evil-define-key 'normal git-timemachine-mode-map (kbd "C-k") 'git-timemachine-show-next-revision)
+)
+
+;;setq package-enable-at-startup nil)
+;;(use-package magit :ensure t)
+;;(require 'magit)
+;;(use-package magit
+;;  :ensure t
+;;  :commands (magit-status magit-blame magit-log))
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -504,29 +563,19 @@ one, an error is signaled."
   :ensure t
   :hook (org-mode . org-fragtog-mode))
 
-(use-package doom-themes
+(use-package hl-todo
   :ensure t
+  :hook ((org-mode . hl-todo-mode)
+         (prog-mode . hl-todo-mode))
   :config
-  (load-theme 'doom-one t))
-
-(setq my/dark-theme 'doom-one)
-(setq my/light-theme 'doom-opera-light)
-(setq my/current-theme my/dark-theme)
-
-(defun my/toggle-theme ()
-  "Toggle between dark and light Doom themes."
-  (interactive)
-  (disable-theme my/current-theme)
-  (setq my/current-theme
-        (if (eq my/current-theme my/dark-theme)
-            my/light-theme
-          my/dark-theme))
-  (load-theme my/current-theme t))
-
-  ;; Link to make custom themes (https://mswift42.github.io/themecreator/)
-  ;; Make !/.config/emacs/themes/dtmacs-theme.el
-  ;;(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
-  ;;(load-theme 'dtmacs t)
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces
+        `(("TODO"       warning bold)
+          ("FIXME"      error bold)
+          ("HACK"       font-lock-constant-face bold)
+          ("REVIEW"     font-lock-keyword-face bold)
+          ("NOTE"       success bold)
+          ("DEPRECATED" font-lock-doc-face bold))))
 
 (use-package counsel
   :ensure t
@@ -573,6 +622,8 @@ one, an error is signaled."
   :config
   (setq markdown-command "pandoc"))
 
+(global-set-key [escape] 'keyboard-escape-quit)
+
 (use-package doom-modeline
   :ensure t
   :after all-the-icons
@@ -612,9 +663,6 @@ one, an error is signaled."
 (use-package org-bullets :ensure t)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
-;;(electric-indent-mode -1)
-(setq org-edit-src-content-indentation 0)
-
 (require 'org-tempo)
 
 (use-package pdf-tools
@@ -641,11 +689,39 @@ one, an error is signaled."
 
 ;;(define-key pdf-view-mode-map (kbd "g") #'pdf-view-goto-page)
 
+(use-package perspective
+  :ensure t
+  :custom
+  ;; NOTE! I have also set 'SPC SPC' to open the perspective menu.
+  ;; I'm only setting the additional binding because setting it
+  ;; helps suppress an annoying warning message.
+  (persp-mode-prefix-key (kbd "C-c M-p"))
+  :init 
+  (persp-mode)
+  :config
+  ;; Sets a file to write to when we save states
+  (setq persp-state-default-file "~/.config/emacs/sessions"))
+
+;; This will group buffers by persp-name in ibuffer.
+(add-hook 'ibuffer-hook
+          (lambda ()
+            (persp-ibuffer-set-filter-groups)
+            (unless (eq ibuffer-sorting-mode 'alphabetic)
+              (ibuffer-do-sort-by-alphabetic))))
+
+;; Automatically save perspective states to file when Emacs exits.
+(add-hook 'kill-emacs-hook #'persp-state-save)
+
 (use-package projectile
   :ensure t
   :diminish
   :config
   (projectile-mode 1))
+
+(use-package rainbow-delimiters
+  :ensure t
+  :hook ((emacs-lisp-mode . rainbow-delimiters-mode)
+         (clojure-mode . rainbow-delimiters-mode)))
 
 (defun reload-init-file ()
     (interactive)
@@ -711,6 +787,33 @@ one, an error is signaled."
     "f u" '(sudo-edit-find-file :wk "Sudo find file")
     "f U" '(sudo-edit :wk "Sudo edit file")))
 
+(use-package doom-themes
+  :ensure t
+  :config
+  (load-theme 'doom-one t))
+
+(setq my/dark-theme 'doom-one)
+(setq my/light-theme 'doom-opera-light)
+(setq my/current-theme my/dark-theme)
+
+(defun my/toggle-theme ()
+  "Toggle between dark and light Doom themes."
+  (interactive)
+  (disable-theme my/current-theme)
+  (setq my/current-theme
+        (if (eq my/current-theme my/dark-theme)
+            my/light-theme
+          my/dark-theme))
+  (load-theme my/current-theme t))
+
+  ;; Link to make custom themes (https://mswift42.github.io/themecreator/)
+  ;; Make !/.config/emacs/themes/dtmacs-theme.el
+  ;;(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
+  ;;(load-theme 'dtmacs t)
+
+(use-package tldr
+ :ensure t)
+
 (use-package which-key
   :ensure t
   :init
@@ -748,3 +851,13 @@ one, an error is signaled."
 (setq-default c-basic-offset 4)        ;; for C/C++/Java
 (setq-default indent-tabs-mode nil)    ;; expandtab
 (electric-indent-mode 1)               ;; autoindent
+(electric-pair-mode 1)                 ;; pair '(' with ')'
+
+;; The following prevents <> from auto-pairing when electric-pair-mode is on.
+;; Otherwise, org-tempo is broken when you try to <s TAB...
+(add-hook 'org-mode-hook (lambda ()
+           (setq-local electric-pair-inhibit-predicate
+                   `(lambda (c)
+                  (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+
+(setq org-edit-src-content-indentation 0)

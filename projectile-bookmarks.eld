@@ -1,1 +1,1 @@
-("~/.config/emacs/" "~/Desktop/MainFolder/Work/Research/POLARIS-AI/" "~/" "~/Desktop/MainFolder/Work/Stockmarket/Mafic/")
+("~/Desktop/MainFolder/Work/Stockmarket/Mafic/" "~/.config/emacs/" "~/" "~/Desktop/MainFolder/Work/Research/POLARIS-AI/" "~/Desktop/MainFolder/Work/Research/POLARIS-AI/external/RAGEN/")
